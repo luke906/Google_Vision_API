@@ -4,7 +4,8 @@ import os
 from google.cloud import vision
 from google.cloud.vision import types
 from gtts import gTTS
-from pygame import mixer
+
+import pygame
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "google_vision_api.json"
 
@@ -26,12 +27,28 @@ image = types.Image(content=content)
 response = client.label_detection(image=image)
 labels = response.label_annotations
 
-mixer.init()
-
+"""
 for label in labels:
     print(label.description)
-    tts = gTTS(text=label.description, lang='en')
-    tts.save("good.mp3")
-    mixer.music.load("good.mp3")
-    mixer.music.play()
+"""
+def play_music(music_file):
+    pygame.init()
+    pygame.display.set_mode((200, 100))
+    pygame.mixer.music.load(music_file)
+    pygame.mixer.music.play(0)
+
+    clock = pygame.time.Clock()
+    clock.tick(10)
+    while pygame.mixer.music.get_busy():
+        pygame.event.poll()
+        clock.tick(10)
+
+
+if __name__ == "__main__":
+    speech_file = "speech.mp3"
+
+    print(labels[0].description)
+    tts = gTTS(text=labels[0].description, lang='en')
+    tts.save(speech_file)
+    play_music(speech_file)
 
